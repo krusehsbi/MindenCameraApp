@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">DL-CameraApp</string>
+    <string name="capture_button">Capture Image</string>
+</resources>
