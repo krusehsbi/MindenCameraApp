@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
 
     private Interpreter tflite;
     // add your filename here (label names)
-    final String CLASSIFIER_LABEL_File = "labels_mobilenet_quant_v1_224.txt";
+    final String CLASSIFIER_LABEL_File = "alphabet_labels.txt";
     // add your filename here (model file)
-    final String TF_LITE_File = "mobilenet_v1_1.0_224_quant.tflite";
+    final String TF_LITE_File = "MobileNet.tflite";
     List<String> clasifierLabels = null;
 
 
@@ -373,11 +373,12 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                 .add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
                 .build();
 
+
         TensorImage tensorImage = new TensorImage(DataType.UINT8);
         tensorImage.load(bitmapImage);
         tensorImage = imageProcessor.process(tensorImage);
         TensorBuffer probabilityBuffer =
-                TensorBuffer.createFixedSize(new int[]{1, 1001}, DataType.UINT8);
+                TensorBuffer.createFixedSize(new int[]{1, 27}, DataType.UINT8);
 
         if(null != tflite) {
             tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
@@ -449,11 +450,11 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
                     .add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
                     .build();
 
-            TensorImage tensorImage = new TensorImage(DataType.UINT8);
+            TensorImage tensorImage = new TensorImage(DataType.FLOAT32);
             tensorImage.load(bitmapImage);
             tensorImage = imageProcessor.process(tensorImage);
             TensorBuffer probabilityBuffer =
-                    TensorBuffer.createFixedSize(new int[]{1, 1001}, DataType.UINT8);
+                    TensorBuffer.createFixedSize(new int[]{1, 27}, DataType.FLOAT32);
 
             if(null != tflite) {
                 tflite.run(tensorImage.getBuffer(), probabilityBuffer.getBuffer());
@@ -463,10 +464,21 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
 
             String resultString = " ";
             if (null != clasifierLabels) {
+
+                Log.d(TAG, "Labels size: " + clasifierLabels.size());
+                // Log the shape dimensions
+                int[] shape = probabilityBuffer.getShape();
+                StringBuilder shapeStringBuilder = new StringBuilder("Probabilities shape: [");
+                for (int dim : shape) {
+                    shapeStringBuilder.append(dim).append(", ");
+                }
+                shapeStringBuilder.append("]");
+                Log.d(TAG, shapeStringBuilder.toString());
+
+
                 // Map of labels and their corresponding probability
                 TensorLabel labels = new TensorLabel(clasifierLabels,
                         probabilityProcessor.process(probabilityBuffer));
-
                 // Create a map to access the result based on label
                 Map<String, Float> floatMap = labels.getMapWithFloatValue();
                 resultString = getBestResult(floatMap);
