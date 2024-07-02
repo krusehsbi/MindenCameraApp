@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements ImageAnalysis.Ana
     // add your filename here (label names)
     final String CLASSIFIER_LABEL_File = "alphabet_labels.txt";
     // add your filename here (model file)
-    final String TF_LITE_File = "MobileNet.tflite";
+    final String TF_LITE_File = "student_model_mobilenet_10.tflite";
     List<String> clasifierLabels = null;
 
 
